@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title></title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family:arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background: #333;
+        color:white;
+        margin-bottom: 10px;
+        padding: 20px;
+      }
+      .board {
+        margin: 20px;
+        width:400px;
+        height:400px;
+        background: #444;
+        position:relative;
+      }
+      .board > div {
+        position:absolute;
+        width:98px;
+        height:98px;
+        background: #99E;
+        line-height:90px;
+        text-align:center;
+        font-size: 60px;
+        border: 5px inset #AAE;
+        transition: top 0.1s, left 0.1s;
+        cursor: pointer;
+      }
+      .board.success > div {
+        background: #9E9;
+        border: 5px outset #AEA;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      Moves: <span id="moves"></span>
+      <button onclick="newGame()">new game</button>
+    </header>
+    <div class="board">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+      <div>5</div>
+      <div>6</div>
+      <div>7</div>
+      <div>8</div>
+      <div>9</div>
+      <div>10</div>
+      <div>11</div>
+      <div>12</div>
+      <div>13</div>
+      <div>14</div>
+      <div>15</div>
+    </div>
+    <script>
+
+    let board = [
+      [1, 2, 3, 4],
+      [5, 6, 7, 8],
+      [9, 10, 11, 12],
+      [13, 14, 15, 0],
+    ]
+    console.log(JSON.stringify(board))
+
+    let moves = 0;
+    let playing = false;
+
+    const boardDivs = [...document.querySelectorAll('.board div')]
+    const movesDiv = document.querySelector('#moves')
+    const boardDiv = document.querySelector('.board')
+
+    function draw(){
+      for(let line=0; line<4; line++){
+        for(let col=0; col<4; col++){
+          let piece = board[line][col]
+          if(piece){
+            boardDivs[piece-1].style.top = `${line*100}px`
+            boardDivs[piece-1].style.left = `${col*100}px`
+          }
+        }
+      }
+      boardDiv.classList[playing ? 'remove' : 'add']('success')
+      movesDiv.innerHTML = moves
+    }
+
+    function setup(){
+      boardDivs.forEach((div, idx) => div.addEventListener('click', ()=>{
+        move(idx + 1)
+      }))
+      newGame()
+    }
+
+    function newGame(){
+      for(let i=0; i<1000; i++){
+        move(Math.floor(Math.random()*15) + 1, true)
+      }
+      moves = 0
+      playing = true 
+      draw()
+    }
+
+    function move(target, force){
+      if(!(playing || force)) return false
+      for(let line=0; line<4; line++){
+        for(let col=0; col<4; col++){
+          let piece = board[line][col]
+          if(piece == target){
+            if(line && board[line-1][col]==0){
+              return swap(line, col, line-1, col)
+            }
+            if(line < 3 && board[line+1][col]==0){
+              return swap(line, col, line+1, col)
+            }
+            if(col && board[line][col-1]==0){
+              return swap(line, col, line, col-1)
+            }
+            if(col < 3 && board[line][col+1]==0){
+              return swap(line, col, line, col+1)
+            }
+          }
+        }
+      }
+    }
+
+    function swap(origin_line, origin_col, target_line, target_col){
+      moves++
+      board[target_line][target_col] = board[origin_line][origin_col]
+      board[origin_line][origin_col] = 0
+      const template='[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]'
+      if(JSON.stringify(board) == template) playing = false
+      draw()
+    }
+
+
+    setup()
+    </script>
+  </body>
+</html>
