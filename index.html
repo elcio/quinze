@@ -66,20 +66,19 @@
     </div>
     <script>
 
-    let board = [
+    const board = [
       [1, 2, 3, 4],
       [5, 6, 7, 8],
       [9, 10, 11, 12],
       [13, 14, 15, 0],
     ]
-    console.log(JSON.stringify(board))
-
-    let moves = 0;
-    let playing = false;
-
+    const template = JSON.stringify(board)
     const boardDivs = [...document.querySelectorAll('.board div')]
     const movesDiv = document.querySelector('#moves')
     const boardDiv = document.querySelector('.board')
+
+    let moves = 0;
+    let playing = false;
 
     function draw(){
       for(let line=0; line<4; line++){
@@ -117,32 +116,26 @@
         for(let col=0; col<4; col++){
           let piece = board[line][col]
           if(piece == target){
-            if(line && board[line-1][col]==0){
-              return swap(line, col, line-1, col)
-            }
-            if(line < 3 && board[line+1][col]==0){
-              return swap(line, col, line+1, col)
-            }
-            if(col && board[line][col-1]==0){
-              return swap(line, col, line, col-1)
-            }
-            if(col < 3 && board[line][col+1]==0){
-              return swap(line, col, line, col+1)
-            }
+              return swap(line, col, line-1, col) ||
+                     swap(line, col, line+1, col) ||
+                     swap(line, col, line, col-1) ||
+                     swap(line, col, line, col+1)
           }
         }
       }
     }
 
     function swap(origin_line, origin_col, target_line, target_col){
-      moves++
-      board[target_line][target_col] = board[origin_line][origin_col]
-      board[origin_line][origin_col] = 0
-      const template='[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]]'
-      if(JSON.stringify(board) == template) playing = false
-      draw()
+      try {
+        if(board[target_line][target_col] != 0) return false
+        moves++
+        board[target_line][target_col] = board[origin_line][origin_col]
+        board[origin_line][origin_col] = 0
+        if(JSON.stringify(board) == template) playing = false
+        draw()
+        return true
+      } catch(e) {}
     }
-
 
     setup()
     </script>
