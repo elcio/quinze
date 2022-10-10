@@ -72,6 +72,9 @@
       [9, 10, 11, 12],
       [13, 14, 15, 0],
     ]
+    const size = board.length
+    const pieceSize = 100
+    const shuffleRounds = 1000
     const template = JSON.stringify(board)
     const boardDivs = [...document.querySelectorAll('.board div')]
     const movesDiv = document.querySelector('#moves')
@@ -81,12 +84,12 @@
     let playing = false;
 
     function draw(){
-      for(let line=0; line<4; line++){
-        for(let col=0; col<4; col++){
+      for(let line=0; line < size; line++){
+        for(let col=0; col < size; col++){
           let piece = board[line][col]
           if(piece){
-            boardDivs[piece-1].style.top = `${line*100}px`
-            boardDivs[piece-1].style.left = `${col*100}px`
+            boardDivs[piece-1].style.top = `${line * pieceSize}px`
+            boardDivs[piece-1].style.left = `${col * pieceSize}px`
           }
         }
       }
@@ -102,8 +105,8 @@
     }
 
     function newGame(){
-      for(let i=0; i<1000; i++){
-        move(Math.floor(Math.random()*15) + 1, true)
+      for(let i=0; i < shuffleRounds; i++){
+        move(Math.floor(Math.random() * (size * size - 1)) + 1, true)
       }
       moves = 0
       playing = true 
@@ -112,8 +115,8 @@
 
     function move(target, force){
       if(!(playing || force)) return false
-      for(let line=0; line<4; line++){
-        for(let col=0; col<4; col++){
+      for(let line=0; line < size; line++){
+        for(let col=0; col < size; col++){
           let piece = board[line][col]
           if(piece == target){
               return swap(line, col, line-1, col) ||
